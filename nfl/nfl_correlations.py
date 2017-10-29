@@ -6,27 +6,18 @@ def parse_game(game_line):
 	## recycled from NHL script, returns dict with what teams
 	## and adds the number of wins (1 or 0) for each team
 	game = game_line.split(",")
-	if ":" in game[0]:
-		game.pop(0)
-	away = game[0]
-	away_points = game[1]
-	away_wins = 0
+
+	winner = game[4]
 	
-	home = game[2]
-	home_points = game[3]
-	home_wins = 0
+	loser = game[6]
 	
-	if int(away_points) > int(home_points):
-		away_wins = 1
-	elif int(home_points) > int(away_points):
-		home_wins = 1
-	
+	#slightly more convoluted than necessary
 	game_dict = {}
-	game_dict["home"] = home
-	game_dict["away"] = away
-	game_dict["away_wins"] = away_wins
-	game_dict["home_wins"] = home_wins
-	#print(home, home_points, away, away_points, home_wins, away_wins)
+	game_dict["winner"] = winner
+	game_dict["loser"] = loser
+	game_dict["winner_wins"] = 1
+	game_dict["loser_wins"] = 0
+	
 	return game_dict
 
 
@@ -37,11 +28,11 @@ for season in glob.glob("*_season.csv"):
 	teams = {} # dictionary of each team and how many wins after each game
 	with open(season, 'r') as schedule:
 		for line in schedule:
-			if line != "\n":
+			if line[0:4] != "Week":
 				results = parse_game(line)
 
 				## add wins to season records
-				for team in ("home", "away"):
+				for team in ("winner", "loser"):
 					try:
 						wins_to_date = teams[results[team]][-1]
 						teams[results[team]].append(wins_to_date + results[team+"_wins"])
@@ -50,18 +41,14 @@ for season in glob.glob("*_season.csv"):
 						teams[results[team]].append(results[team+"_wins"])
 
 	season_by_games = []
-	# print(season)
-	# print(teams)
-	# print(len(teams["Philadelphia 76ers"]))
-
+	
 	# there's probably more gymnastics than necessary here but it's fast enough as is.
-	games_in_season = len(teams["Philadelphia 76ers"])
-	for i in range(games_in_season): # just using the 76ers to get length
+	games_in_season = len(teams["Pittsburgh Steelers"])
+	for i in range(games_in_season): # just using the Steelers to get season length
 		season_by_games.append({})
 	for team in teams.keys():
-		for i in range(len(teams["Philadelphia 76ers"])):
-			#print(i, team, season)
-			try: # 2013 the Celtics and Pacers only played 81 games, exclude these.
+		for i in range(len(teams["Pittsburgh Steelers"])):
+			try: # In case a team didn't play a full schedule (i.e. 2013 Celtics in NBA)
 				season_by_games[i][team] = teams[team][i]
 			except:
 				pass
@@ -94,7 +81,7 @@ for game in season_rvals:
 	print("by game " + str(i) + " the r^2 between current and final standings is: " + str(average_rval))
 	i += 1
 		
-with open("NBA_r_squared_table.csv", 'w') as out:
+with open("NFL_r_squared_table.csv", 'w') as out:
 	out.write("game,r_squared\n")
 	i = 1
 	for game in season_rvals:
