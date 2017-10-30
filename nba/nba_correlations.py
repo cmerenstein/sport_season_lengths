@@ -55,11 +55,11 @@ for season in glob.glob("*_season.csv"):
 	# print(len(teams["Philadelphia 76ers"]))
 
 	# there's probably more gymnastics than necessary here but it's fast enough as is.
-	games_in_season = len(teams["Philadelphia 76ers"])
+	games_in_season = 20# len(teams["Philadelphia 76ers"])
 	for i in range(games_in_season): # just using the 76ers to get length
 		season_by_games.append({})
 	for team in teams.keys():
-		for i in range(len(teams["Philadelphia 76ers"])):
+		for i in range(games_in_season):
 			#print(i, team, season)
 			try: # 2013 the Celtics and Pacers only played 81 games, exclude these.
 				season_by_games[i][team] = teams[team][i]
@@ -94,7 +94,7 @@ for game in season_rvals:
 	print("by game " + str(i) + " the r^2 between current and final standings is: " + str(average_rval))
 	i += 1
 		
-with open("NBA_r_squared_table.csv", 'w') as out:
+with open("NBA_r_squared_table_20.csv", 'w') as out:
 	out.write("game,r_squared\n")
 	i = 1
 	for game in season_rvals:
